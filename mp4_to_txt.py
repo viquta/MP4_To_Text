@@ -38,22 +38,27 @@ def wav_to_text(wav_files, output_file):
     
     for index, wav_file in enumerate(wav_files):
         print(f"\nProcessing file {index + 1}/{len(wav_files)}: {wav_file}")
-        with sr.AudioFile(wav_file) as source:
-            audio_duration = int(source.DURATION * 1000)  # Get duration in milliseconds
-            progress_bar = tqdm(total=audio_duration, desc=f"Transcribing {wav_file}", unit="ms")
-            
-            for chunk_start in range(0, audio_duration, 10000):  # Process in 10-second chunks
-                audio_data = r.record(source, duration=10)
+        audio = AudioSegment.from_wav(wav_file)
+        audio_duration = len(audio)  # duration in milliseconds
+        progress_bar = tqdm(total=audio_duration, desc=f"Transcribing {wav_file}", unit="ms")
+        chunk_length = 10000  # 10 seconds in ms
+        for chunk_start in range(0, audio_duration, chunk_length):
+            chunk = audio[chunk_start:chunk_start + chunk_length]
+            chunk_filename = f"{wav_file}_chunk.wav"
+            chunk.export(chunk_filename, format="wav")
+            with sr.AudioFile(chunk_filename) as source:
+                audio_data = r.record(source)
                 try:
-                    text = r.recognize_google(audio_data)
+                    # recognize_google is a valid method of speech_recognition.Recognizer
+                    text = r.recognize_google(audio_data)  # type: ignore
                     full_text += text + " "
                 except sr.RequestError as e:
                     print(f"Failed API request: {e}")
                 except sr.UnknownValueError:
                     print(f"{wav_file} : Detected unrecognizable speech")
-                progress_bar.update(10000)
-            
-            progress_bar.close()
+            os.remove(chunk_filename)
+            progress_bar.update(chunk_length)
+        progress_bar.close()
     
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(full_text)
@@ -69,9 +74,9 @@ def wav_to_text(wav_files, output_file):
             except OSError as e:
                 print(f"Error deleting {wav_file}: {e}")
 # Usage
-video_path = "C:/Users/audio.mp4"  # Replace with your MP4 file path
-wav_output_path = "C:/Users/output_audio.wav"
-text_output_path = "C:/Users/output.txt"
+video_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/test2.mp4"
+wav_output_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/output_audio2.wav"
+text_output_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/output2.txt"
 
 # Step 1: Convert MP4 to WAV
 mp4_to_wav(video_path, wav_output_path)
