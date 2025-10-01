@@ -1,4 +1,4 @@
-import moviepy.editor as mp
+import moviepy.editor as mp #remember to install moviepy.editor that is vers 1.0.3 and not latest because of a bug
 import speech_recognition as sr
 from pydub import AudioSegment
 import os
@@ -74,9 +74,9 @@ def wav_to_text(wav_files, output_file):
             except OSError as e:
                 print(f"Error deleting {wav_file}: {e}")
 # Usage
-video_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/test2.mp4"
-wav_output_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/output_audio2.wav"
-text_output_path = "/Users/victorhristov/Documents/GitHub/MP4_To_Text/output2.txt"
+video_path = "/put your mp4 file path here.mp4"
+wav_output_path = "/put your wav output file path here.wav"
+text_output_path = "/put your text output file path here.txt"
 
 # Step 1: Convert MP4 to WAV
 mp4_to_wav(video_path, wav_output_path)
